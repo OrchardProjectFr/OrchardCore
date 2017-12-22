@@ -85,23 +85,17 @@ goto :EOF
 :Deployment
 echo Handling python deployment.
 
-:: 1. KuduSync
-IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
-  call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_SOURCE%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
-  IF !ERRORLEVEL! NEQ 0 goto error
-)
-
 IF NOT EXIST "%DEPLOYMENT_TARGET%\requirements.txt" goto postPython
 IF EXIST "%DEPLOYMENT_TARGET%\.skipPythonDeployment" goto postPython
 
 echo Detected requirements.txt.  You can skip Python specific steps with a .skipPythonDeployment file.
 
-:: 2. Select Python version
+:: 1. Select Python version
 call :SelectPythonVersion
 
 pushd "%DEPLOYMENT_TARGET%"
 
-:: 3. Create virtual environment
+:: 2. Create virtual environment
 IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
   IF EXIST "%DEPLOYMENT_TARGET%\env" (
     echo Deleting incompatible virtual environment.
@@ -118,7 +112,7 @@ IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
   echo Found compatible virtual environment.
 )
 
-:: 4. Install packages
+:: 3. Install packages
 echo Pip install requirements.
 env\scripts\pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
@@ -128,17 +122,17 @@ REM -- Example --
 REM env\scripts\easy_install pytz
 REM IF !ERRORLEVEL! NEQ 0 goto error
 
-:: 5. Build mkdocs
+:: 4. Build mkdocs
 echo Building mkdocs
 env\scripts\mkdocs build
 
-:: 6. KuduSync
+:: 5. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_SOURCE%\site" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
-:: 7. Copy web.config
+:: 6. Copy web.config
 IF EXIST "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" (
   echo Overwriting web.config with web.%PYTHON_VER%.config
   copy /y "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" "%DEPLOYMENT_TARGET%\web.config"
