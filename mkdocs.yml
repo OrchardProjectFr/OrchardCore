@@ -1,5 +1,4 @@
 site_name: Orchard Core Documentation
-theme_dir: 'src/docs/material'
 theme:
   language: 'en'
   name: 'material'
