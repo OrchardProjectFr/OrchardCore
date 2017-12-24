@@ -2,7 +2,7 @@
 
 :: ----------------------
 :: KUDU Deployment Script
-:: Version: 1.0.9
+:: Version: 1.0.15
 :: ----------------------
 
 :: Prerequisites
@@ -85,21 +85,21 @@ goto :EOF
 :Deployment
 echo Handling python deployment.
 
-IF NOT EXIST "%DEPLOYMENT_SOURCE%\requirements.txt" goto postPython
-IF EXIST "%DEPLOYMENT_SOURCE%\.skipPythonDeployment" goto postPython
+IF NOT EXIST "%DEPLOYMENT_TARGET%\requirements.txt" goto postPython
+IF EXIST "%DEPLOYMENT_TARGET%\.skipPythonDeployment" goto postPython
 
 echo Detected requirements.txt.  You can skip Python specific steps with a .skipPythonDeployment file.
 
 :: 1. Select Python version
 call :SelectPythonVersion
 
-pushd "%DEPLOYMENT_SOURCE%"
+pushd "%DEPLOYMENT_TARGET%"
 
 :: 2. Create virtual environment
-IF NOT EXIST "%DEPLOYMENT_SOURCE%\env\azure.env.%PYTHON_RUNTIME%.txt" (
-  IF EXIST "%DEPLOYMENT_SOURCE%\env" (
+IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
+  IF EXIST "%DEPLOYMENT_TARGET%\env" (
     echo Deleting incompatible virtual environment.
-    rmdir /q /s "%DEPLOYMENT_SOURCE%\env"
+    rmdir /q /s "%DEPLOYMENT_TARGET%\env"
     IF !ERRORLEVEL! NEQ 0 goto error
   )
 
@@ -107,7 +107,7 @@ IF NOT EXIST "%DEPLOYMENT_SOURCE%\env\azure.env.%PYTHON_RUNTIME%.txt" (
   %PYTHON_EXE% -m %PYTHON_ENV_MODULE% env
   IF !ERRORLEVEL! NEQ 0 goto error
 
-  copy /y NUL "%DEPLOYMENT_SOURCE%\env\azure.env.%PYTHON_RUNTIME%.txt" >NUL
+  copy /y NUL "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" >NUL
 ) ELSE (
   echo Found compatible virtual environment.
 )
