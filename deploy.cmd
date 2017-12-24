@@ -93,13 +93,13 @@ echo Detected requirements.txt.  You can skip Python specific steps with a .skip
 :: 1. Select Python version
 call :SelectPythonVersion
 
-pushd "%DEPLOYMENT_TARGET%"
+pushd "%DEPLOYMENT_SOURCE%"
 
 :: 2. Create virtual environment
-IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
-  IF EXIST "%DEPLOYMENT_TARGET%\env" (
+IF NOT EXIST "%DEPLOYMENT_SOURCE%\env\azure.env.%PYTHON_RUNTIME%.txt" (
+  IF EXIST "%DEPLOYMENT_SOURCE%\env" (
     echo Deleting incompatible virtual environment.
-    rmdir /q /s "%DEPLOYMENT_TARGET%\env"
+    rmdir /q /s "%DEPLOYMENT_SOURCE%\env"
     IF !ERRORLEVEL! NEQ 0 goto error
   )
 
@@ -107,7 +107,7 @@ IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
   %PYTHON_EXE% -m %PYTHON_ENV_MODULE% env
   IF !ERRORLEVEL! NEQ 0 goto error
 
-  copy /y NUL "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" >NUL
+  copy /y NUL "%DEPLOYMENT_SOURCE%\env\azure.env.%PYTHON_RUNTIME%.txt" >NUL
 ) ELSE (
   echo Found compatible virtual environment.
 )
