@@ -1,6 +1,5 @@
 site_name: Orchard Core Documentation
 theme:
-  language: 'en'
   name: 'material'
   logo: 'images/orchard-logo.png'
   font:
